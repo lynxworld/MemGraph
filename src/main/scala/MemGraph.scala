@@ -1,9 +1,5 @@
-import org.grapheco.lynx.util.Profiler
-import org.grapheco.lynx.{CallableProcedure, ContextualNodeInputRef, CypherRunner, DefaultProcedureRegistry, DefaultProcedures, GraphModel, LynxId, LynxInteger, LynxList, LynxNode, LynxNodeLabel, LynxPropertyKey, LynxRelationship, LynxRelationshipType, LynxResult, LynxTransaction, LynxType, LynxValue, NodeFilter, NodeInput, NodeInputRef, PathTriple, ProcedureRegistry, RelationshipFilter, RelationshipInput, StoredNodeInputRef, WriteTask}
-import org.opencypher.v9_0.expressions.{LabelName, PropertyKeyName, Range, SemanticDirection}
-
+import org.grapheco.lynx.{ContextualNodeInputRef, CypherRunner, GraphModel, LynxId, LynxNode, LynxNodeLabel, LynxPropertyKey, LynxRelationship, LynxRelationshipType, LynxResult, LynxValue, NodeInput, NodeInputRef, PathTriple, RelationshipInput, StoredNodeInputRef, WriteTask}
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.language.implicitConversions
 
 /**
@@ -27,9 +23,9 @@ class MemGraph extends GraphModel {
 
   private def relationshipId: MyId = {_relationshipId += 1; MyId(_relationshipId)}
 
-  private def nodeAt(id: LynxId): Option[MyNode] = _nodes.get(id.asInstanceOf[MyId])
+  private def nodeAt(id: LynxId): Option[MyNode] = _nodes.get(id)
 
-  private def relationshipAt(id: LynxId): Option[MyRelationship] = _relationships.get(id.asInstanceOf[MyId])
+  private def relationshipAt(id: LynxId): Option[MyRelationship] = _relationships.get(id)
 
   implicit def lynxId2myId(lynxId: LynxId): MyId = MyId(lynxId.value.asInstanceOf[Long])
 
