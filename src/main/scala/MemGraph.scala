@@ -43,7 +43,6 @@ class MemGraph extends GraphModel {
 
     val _relationshipsToDelete: mutable.ArrayBuffer[MyId] = mutable.ArrayBuffer()
 
-
     private def updateNodes(ids: Iterator[LynxId], update: MyNode => MyNode): Iterator[Option[LynxNode]] = {
       ids.map{ id =>
           val updated = _nodesBuffer.get(id).orElse(nodeAt(id)).map(update)
