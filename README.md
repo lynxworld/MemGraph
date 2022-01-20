@@ -55,7 +55,7 @@ private val _relationships: mutable.Map[MyId, MyRelationship] = mutable.Map()
 ```
 private var _nodeId: Long = 0
 
-private var _relationshipId = 0
+private var _relationshipId: Long = 0
 
 private def nodeId: MyId = {_nodeId += 1; MyId(_nodeId)}
 
@@ -91,17 +91,19 @@ override def createElements[T](nodesInput: Seq[(String, NodeInput)],
                                relationshipsInput: Seq[(String, RelationshipInput)],
                                onCreated: (Seq[(String, LynxNode)], Seq[(String, LynxRelationship)]) => T): T = {
   val nodesMap: Map[String, MyNode] = nodesInput.toMap
-    .mapValues(input => MyNode(nodeId, input.labels, input.props.toMap))
+    .map{case (valueName,input) => valueName -> MyNode(nodeId, input.labels, input.props.toMap)}
 
   def localNodeRef(ref: NodeInputRef): MyId = ref match {
     case StoredNodeInputRef(id) => id
     case ContextualNodeInputRef(valueName) => nodesMap(valueName).id
   }
 
-  val relationshipsMap: Map[String, MyRelationship] = relationshipsInput.toMap.mapValues(input =>
-    MyRelationship(relationshipId, localNodeRef(input.startNodeRef),
-      localNodeRef(input.endNodeRef), input.types.headOption,input.props.toMap))
-
+  val relationshipsMap: Map[String, MyRelationship] = relationshipsInput.toMap.map{
+    case (valueName,input) =>
+      valueName -> MyRelationship(relationshipId, localNodeRef(input.startNodeRef),
+        localNodeRef(input.endNodeRef), input.types.headOption,input.props.toMap)
+  }
+  
   _nodesBuffer ++= nodesMap.map{ case (_, node) => (node.id, node)}
   _relationshipsBuffer ++= relationshipsMap.map{ case (_, relationship) => (relationship.id, relationship)}
   onCreated(nodesMap.toSeq, relationshipsMap.toSeq)
@@ -185,7 +187,7 @@ override def commit: Boolean = {
 private val runner = new CypherRunner(this)
 
 def run(query: String, param: Map[String, Any] = Map.empty[String, Any]): LynxResult = {
-  runner.compile(query)
+  // runner.compile(query)
   runner.run(query, param, None)
 }
 ```

@@ -17,7 +17,7 @@ class MemGraph extends GraphModel {
 
   private var _nodeId: Long = 0
 
-  private var _relationshipId = 0
+  private var _relationshipId: Long = 0
 
   private def nodeId: MyId = {_nodeId += 1; MyId(_nodeId)}
 
@@ -29,7 +29,8 @@ class MemGraph extends GraphModel {
 
   implicit def lynxId2myId(lynxId: LynxId): MyId = MyId(lynxId.value.asInstanceOf[Long])
 
-  override def writeTask: WriteTask =  new WriteTask {
+  override def writeTask: WriteTask = _writeTask
+  val _writeTask: WriteTask = new WriteTask {
 
     val _nodesBuffer: mutable.Map[MyId, MyNode] = mutable.Map()
 
@@ -59,16 +60,18 @@ class MemGraph extends GraphModel {
                                    relationshipsInput: Seq[(String, RelationshipInput)],
                                    onCreated: (Seq[(String, LynxNode)], Seq[(String, LynxRelationship)]) => T): T = {
       val nodesMap: Map[String, MyNode] = nodesInput.toMap
-        .mapValues(input => MyNode(nodeId, input.labels, input.props.toMap))
+        .map{case (valueName,input) => valueName -> MyNode(nodeId, input.labels, input.props.toMap)}
 
       def localNodeRef(ref: NodeInputRef): MyId = ref match {
         case StoredNodeInputRef(id) => id
         case ContextualNodeInputRef(valueName) => nodesMap(valueName).id
       }
 
-      val relationshipsMap: Map[String, MyRelationship] = relationshipsInput.toMap.mapValues(input =>
-        MyRelationship(relationshipId, localNodeRef(input.startNodeRef),
-          localNodeRef(input.endNodeRef), input.types.headOption,input.props.toMap))
+      val relationshipsMap: Map[String, MyRelationship] = relationshipsInput.toMap.map{
+        case (valueName,input) =>
+          valueName -> MyRelationship(relationshipId, localNodeRef(input.startNodeRef),
+            localNodeRef(input.endNodeRef), input.types.headOption,input.props.toMap)
+      }
 
       _nodesBuffer ++= nodesMap.map{ case (_, node) => (node.id, node)}
       _relationshipsBuffer ++= relationshipsMap.map{ case (_, relationship) => (relationship.id, relationship)}
@@ -130,7 +133,7 @@ class MemGraph extends GraphModel {
   private val runner = new CypherRunner(this)
 
   def run(query: String, param: Map[String, Any] = Map.empty[String, Any]): LynxResult = {
-    runner.compile(query)
+//    runner.compile(query)
     runner.run(query, param, None)
   }
 }
