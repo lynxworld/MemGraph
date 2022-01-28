@@ -1,5 +1,13 @@
 # MemGraph: An in-memory graph database based on Lynx
 ## Introduction
+通过maven引入Lynx
+```
+<dependency>
+    <groupId>org.grapheco</groupId>
+    <artifactId>lynx</artifactId>
+    <version>0.4.1</version>
+</dependency>
+```
 ## Step 1: Base Element
 首先需要实现Lynx中的图数据基本元素: LynxNode和LynxRelationship
 #### MyId
@@ -85,7 +93,10 @@ val _relationshipsBuffer: mutable.Map[MyId, MyRelationship] = mutable.Map()
 
 val _relationshipsToDelete: mutable.ArrayBuffer[MyId] = mutable.ArrayBuffer()
 ```
-实现创建元素方法: TODO explain
+实现创建元素方法: createElements有三个变量，前两个为输入元素，即要create的节点和关系。
+onCreated为回调函数，传入创建好的元素。
+需要注意的是，关系输入中的起始节点id是一个NodeInputRef类型，包括两种情况，一是该节点的绝对id，
+或者该节点是nodesInput中的一个，此时由于还没有id，用name进行定位。这里针对这些情况定义了localNodeRef方法用于区分处理。
 ```
 override def createElements[T](nodesInput: Seq[(String, NodeInput)],
                                relationshipsInput: Seq[(String, RelationshipInput)],

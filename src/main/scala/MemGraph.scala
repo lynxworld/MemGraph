@@ -29,7 +29,7 @@ class MemGraph extends GraphModel {
 
   implicit def lynxId2myId(lynxId: LynxId): MyId = MyId(lynxId.value.asInstanceOf[Long])
 
-  override def writeTask: WriteTask = _writeTask
+  override def write: WriteTask = _writeTask
   val _writeTask: WriteTask = new WriteTask {
 
     val _nodesBuffer: mutable.Map[MyId, MyNode] = mutable.Map()
@@ -132,8 +132,5 @@ class MemGraph extends GraphModel {
 
   private val runner = new CypherRunner(this)
 
-  def run(query: String, param: Map[String, Any] = Map.empty[String, Any]): LynxResult = {
-//    runner.compile(query)
-    runner.run(query, param, None)
-  }
+  def run(query: String, param: Map[String, Any] = Map.empty[String, Any]): LynxResult = runner.run(query, param)
 }

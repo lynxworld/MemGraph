@@ -20,6 +20,12 @@
             <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.grapheco</groupId>
+            <artifactId>lynx</artifactId>
+            <version>0.4.1</version>
+        </dependency>
+
     </dependencies>
 
 </project>
