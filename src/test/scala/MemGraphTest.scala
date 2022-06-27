@@ -1,5 +1,11 @@
 import org.junit.Test
 
+import java.io.File
+import scala.::
+import scala.io.Source
+
+
+
 /**
  * @ClassName MemGraphTest
  * @Description TODO
@@ -13,6 +19,27 @@ class MemGraphTest {
 
   @Test
   def createTest(): Unit ={
-    memGraph.run("create (n:Person{age:1}) return n").show()
+    /*替换成resouces下的queries目录*/
+    val path = "/Users/along/github/MemGraph/src/test/resources/queries"
+    val queriesDir = new File(path)
+    val file = queriesDir.listFiles()
+
+    var cyphers:List[String] = List()
+
+    file.foreach(e=>{
+      val source = Source.fromFile(e)
+      val lines = source.mkString
+      try{
+        memGraph.run(lines)
+      }catch {
+        case ex:Exception=>{
+          cyphers = e.getName :: cyphers
+        }
+      }
+    })
+
+    println("不支持的cypher文件：")
+    cyphers = cyphers.sorted
+    cyphers.foreach(println)
   }
 }
